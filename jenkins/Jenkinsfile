@@ -1,21 +1,18 @@
 pipeline {
     agent any
     
-    environment{ 
-        JGIT_TAG="${tagToCreate}.${BUILD_NUMBER}.fun-fe-${APP_ENV}"
-        KANE_BASE="${ECR_URL}/${APP_NAME}-${APP_ENV}-base:latest"
-    }
+    // environment{ 
+    //     JGIT_TAG="${tagToCreate}.${BUILD_NUMBER}.fun-fe-${APP_ENV}"
+    //     KANE_BASE="${ECR_URL}/${APP_NAME}-${APP_ENV}-base:latest"
+    // }
+
     stages {
         stage('ECR Login') {
             steps {
-                script {
-                    currentBuild.displayName = "#${BUILD_NUMBER}-${APP_ENV}"
-                }
-                sh '''#!/bin/bash
-                 $(aws ecr get-login --region=us-west-2 --no-include-email)
-                '''
+                sh 'aws s3 ls'
             }
         }
+
     //     stage('Checkout code and Tag it') {
     //         steps {
                 
