@@ -1,0 +1,152 @@
+pipeline {
+    agent any
+    
+    environment{ 
+        JGIT_TAG="${tagToCreate}.${BUILD_NUMBER}.fun-fe-${APP_ENV}"
+        KANE_BASE="${ECR_URL}/${APP_NAME}-${APP_ENV}-base:latest"
+    }
+    stages {
+        stage('ECR Login') {
+            steps {
+                script {
+                    currentBuild.displayName = "#${BUILD_NUMBER}-${APP_ENV}"
+                }
+                sh '''#!/bin/bash
+                 $(aws ecr get-login --region=us-west-2 --no-include-email)
+                '''
+            }
+        }
+    //     stage('Checkout code and Tag it') {
+    //         steps {
+                
+    //             dir('src'){
+                    
+    //                 git branch: "${KANE_BRANCH}",
+    //                     credentialsId: "${GIT_CREDS}",
+    //                     url: 'git@github.com:funi-main/kane-funimation-v2.git'
+    //                 sh 'git tag -a -f ${JGIT_TAG} -m "Jenkins build tag"'
+    //                 sshagent(["${GIT_CREDS}"]) {
+    //                     sh "git push git@github.com:funi-main/kane-funimation-v2.git ${JGIT_TAG}"
+    //                 }
+                    
+    //             }
+    //             dir('geoip'){
+    //                 git branch: "master",
+    //                     credentialsId: "${GIT_CREDS}",
+    //                     url: 'git@github.com:maxmind/geoipupdate.git'
+    //             }
+                
+    //         }
+    //     }
+        
+    //     stage('Docker Prepare ENV') {
+    //         steps {
+                
+    //             sh '''#!/bin/bash
+    //             sed -i 's/BUILD_NUMBER_PLACEHOLDER/$BUILD_NUMBER/g' frontend-v2/Dockerfile
+    //             sed -i 's/JENKINS_JOB_NAME_PLACEHOLDER/$JOB_NAME/g' frontend-v2/Dockerfile
+    //             sed -i 's/GIT_TAG_PLACEHOLDER/${tagName:-Untagged}/g' frontend-v2/Dockerfile
+    //             sed -i 's/GIT_BRANCH_PLACEHOLDER/$KANE_BRANCH/g' frontend-v2/Dockerfile
+    //             docker pull ${KANE_BASE} || true
+    //             mv frontend-v2/* ./
+    //             cp -r maintenance src/kane
+                
+    //             #For now we have a condition for each environment, in case we are testing changes on qa but don't want to push them to UAT
+         
+		// 		case ${KANE_BRANCH} in
+		// 			python3-upgrade)
+		// 			rm nginx_site.conf && mv nginx-redirect.conf nginx_site.conf
+		// 			;;
+		// 			qa)
+		// 		        rm nginx_site.conf && mv nginx-redirect.conf nginx_site.conf
+		// 		        ;;
+		// 		   	uat)
+		// 		        rm nginx_site.conf && mv nginx-redirect.conf nginx_site.conf
+		// 		        ;;
+		// 			*)
+		// 		        echo "No Environment Found"
+		// 		        exit 1
+				                
+		// 		        ;;
+		// 		esac
+                
+    //             '''
+    //         }
+    //     }
+
+    //     stage('Docker Build Base') {
+    //         when {
+
+    //             expression { return BUILD_OPTIONS.contains("kane-base") }
+    //         }
+    //         steps {
+                
+    //             sh '''#!/bin/bash
+    //             docker build \
+    //             --cache-from ${KANE_BASE} \
+    //             -t ${KANE_BASE} \
+    //             -f BaseDockerfile . && \
+    //             docker push ${KANE_BASE}
+    //             '''
+    //         }
+    //     }
+
+    //     stage('Docker Build Kane') {
+    //         steps {
+                
+    //             sh '''#!/bin/bash
+
+    //             docker build \
+    //             --build-arg KANE_BASE=${KANE_BASE} \
+    //             -t ${ECR_URL}/${APP_NAME}-${APP_ENV}:latest \
+    //             -t ${ECR_URL}/${APP_NAME}-${APP_ENV}:${JGIT_TAG} \
+    //             -f Dockerfile .
+    //             docker push ${ECR_URL}/${APP_NAME}-${APP_ENV}:latest
+    //             docker push ${ECR_URL}/${APP_NAME}-${APP_ENV}:${JGIT_TAG}
+    //             '''
+    //         }
+    //     }
+
+    //     stage('Deploy') {
+    //         steps {
+    //             sh '''#!/bin/bash
+    //             #docker push ${ECR_URL}/${APP_NAME}-${APP_ENV}:${JGIT_TAG}
+    //             echo 'Deploying...'
+    //             ecs deploy ${APP_NAME^^}-${APP_ENV^^} frontend -t ${JGIT_TAG} --region us-west-2 --ignore-warnings || true
+                
+    //             aws ecs wait services-stable --cluster ${APP_NAME^^}-${APP_ENV^^} --services frontend --region us-west-2
+                
+    //             '''
+    //         }
+    //     }
+    //     stage('Purge Cache') {
+    //         steps {
+    //             sh '''#!/bin/bash
+    //             case ${APP_ENV,,} in
+		// 			python3)
+		// 			#aws cloudfront create-invalidation --distribution-id ${} --paths "/*"
+		// 			;;
+		// 			qa)
+		// 		        #aws cloudfront create-invalidation --distribution-id ${} --paths "/*"
+		// 		        ;;
+		// 		   	uat)
+		// 		        #aws cloudfront create-invalidation --distribution-id ${} --paths "/*"
+		// 		        ;;
+		// 			*)
+		// 		        echo "No Environment Found"
+		// 			exit 1
+				        
+				                
+		// 		        ;;
+		// 		esac
+    //             '''
+    //         }
+    //     }
+    }
+    // post {
+    //     always {
+    //         // deleteDir()
+    //         cleanWs()
+    //     }
+    // }
+}
